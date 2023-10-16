@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Book</title>
+</head>
+
+<body>
+<h1>Address Book Management</h1>
+
+<h2>Create Address Book</h2>
+<form th:action="@{/address-book}" method="post">
+    <label for="addressBookName">Address Book Name:</label>
+    <input type="text" id="addressBookName" name="name" required>
+    <button type="submit">Create Address Book</button>
+</form>
+
+<h2>Address Books</h2>
+<ul>
+    <li th:each="addressBook : ${addressBooks}">
+        <span th:text="${addressBook.name}"></span>
+        <form th:action="@{'/address-book/' + ${addressBook.id}}" method="delete">
+            <button type="submit">Delete Address Book</button>
+        </form>
+
+        <h3>Buddies</h3>
+        <ul>
+            <li th:each="buddy : ${addressBook.buddyList}">
+                <span th:text="${buddy.name} + ' - ' + ${buddy.address} + ' - ' + ${buddy.number}"></span>
+
+                <form th:action="@{'/buddy-info/' + ${buddy.id}}" method="delete">
+                    <button type="submit">Remove Buddy</button>
+                </form>
+            </li>
+        </ul>
+
+        <br/>
+    </li>
+</ul>
+
+<h2>Create Buddy</h2>
+<form th:action="@{/buddy-info}" method="post">
+    <label for="buddyName">Buddy Name:</label>
+    <input type="text" id="buddyName" name="name" required>
+    <label for="buddyAddress">Buddy Address:</label>
+    <input type="text" id="buddyAddress" name="address" required>
+    <label for="buddyNumber">Buddy Number:</label>
+    <input type="text" id="buddyNumber" name="address" required>
+    <label for="addressBookId">Address Book ID:</label>
+    <input type="text" id="addressBookId" name="address" required>
+    <button type="submit">Create Buddy</button>
+</form>
+
+</body>
+
+</html>
