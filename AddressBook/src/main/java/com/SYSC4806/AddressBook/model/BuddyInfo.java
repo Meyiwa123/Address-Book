@@ -15,12 +15,11 @@ public class BuddyInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String buddyName;
     private String address;
     private int number;
 
     @ManyToOne
     @JsonIgnore
     private AddressBook addressBook;
-
 }

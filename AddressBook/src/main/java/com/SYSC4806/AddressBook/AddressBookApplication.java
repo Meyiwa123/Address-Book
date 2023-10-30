@@ -1,7 +1,7 @@
 package com.SYSC4806.AddressBook;
 
-import com.SYSC4806.AddressBook.model.AddressBook;
-import com.SYSC4806.AddressBook.model.BuddyInfo;
+import com.SYSC4806.AddressBook.dto.AddressBookDTO;
+import com.SYSC4806.AddressBook.dto.BuddyInfoDTO;
 import com.SYSC4806.AddressBook.service.AddressBookService;
 import com.SYSC4806.AddressBook.service.BuddyInfoService;
 import org.springframework.boot.CommandLineRunner;
@@ -19,28 +19,28 @@ public class AddressBookApplication {
 	@Bean
 	public CommandLineRunner demo(AddressBookService addressBookService, BuddyInfoService buddyInfoService) {
 		return (args) -> {
-			AddressBook addressBook = AddressBook.builder()
+			AddressBookDTO addressBook = AddressBookDTO.builder()
 					.name("Address Book 1")
 					.build();
-			AddressBook addressBook2 = AddressBook.builder()
+			AddressBookDTO addressBook2 = AddressBookDTO.builder()
 					.name("Address Book 2")
 					.build();
 			addressBookService.createAddressBook(addressBook);
 			addressBookService.createAddressBook(addressBook2);
 
-			BuddyInfo buddyInfo = BuddyInfo.builder()
-					.name("John")
-					.address("Carleton")
-					.number(1234567890)
+			BuddyInfoDTO buddyInfo = BuddyInfoDTO.builder()
+					.buddyName("Buddy 1")
+					.address("Address 1")
+					.number(123456789)
 					.build();
-			BuddyInfo buddyInfo2 = BuddyInfo.builder()
-					.name("Jane")
-					.address("Carleton")
+			BuddyInfoDTO buddyInfo2 = BuddyInfoDTO.builder()
+					.buddyName("Buddy 2")
+					.address("Address 2")
 					.number(24680)
 					.build();
-			BuddyInfo buddyInfo3 = BuddyInfo.builder()
-					.name("Baba")
-					.address("South-Keys")
+			BuddyInfoDTO buddyInfo3 = BuddyInfoDTO.builder()
+					.buddyName("Buddy 3")
+					.address("Address 3")
 					.number(13579)
 					.build();
 			buddyInfoService.createBuddyInfo(1L, buddyInfo);

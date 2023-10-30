@@ -1,59 +1,236 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org" lang="eng">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Address Book</title>
+    <meta charset="ISO-8859-1">
+    <title>Spring System</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
 </head>
-
 <body>
-<h1>Address Book Management</h1>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <p class="navbar-brand">Address Book Management</p>
+</nav>
 
-<h2>Create Address Book</h2>
-<form th:action="@{/address-book}" method="post">
-    <label for="addressBookName">Address Book Name:</label>
-    <input type="text" id="addressBookName" name="name" required>
-    <button type="submit">Create Address Book</button>
-</form>
+<div class ="container">
+    <div class = "row">
+        <h1> Address Books </h1>
+    </div>
 
-<h2>Address Books</h2>
-<ul>
-    <li th:each="addressBook : ${addressBooks}">
-        <span th:text="${addressBook.name}"></span>
-        <form th:action="@{'/address-book/' + ${addressBook.id}}" method="delete">
-            <button type="submit">Delete Address Book</button>
-        </form>
+    <div class = "row">
+        <div class = "col-lg-3">
+            <button class = "btn btn-primary btn-sm mb-3" onclick="createAddressBook()"> Add Address Book</button>
+        </div>
+    </div>
 
-        <h3>Buddies</h3>
-        <ul>
-            <li th:each="buddy : ${addressBook.buddyList}">
-                <span th:text="${buddy.name} + ' - ' + ${buddy.address} + ' - ' + ${buddy.number}"></span>
+    <table class = "table table-striped table-bordered">
+        <thead class = "table-dark">
+        <tr>
+            <th> Address Book ID </th>
+            <th> Address Name </th>
+            <th> Actions </th>
+        </tr>
+        </thead>
+        <tbody id="addressBookTableBody">
+    </table>
 
-                <form th:action="@{'/buddy-info/' + ${buddy.id}}" method="delete">
-                    <button type="submit">Remove Buddy</button>
-                </form>
-            </li>
-        </ul>
+    <div class = "row">
+        <h1> Buddy Info </h1>
+    </div>
 
-        <br/>
-    </li>
-</ul>
+    <div class = "row">
+        <div class = "col-lg-3">
+            <button class = "btn btn-primary btn-sm mb-3" onclick="createBuddyInfo()"> Add Buddy Info</button>
+        </div>
+    </div>
 
-<h2>Create Buddy</h2>
-<form th:action="@{/buddy-info}" method="post">
-    <label for="buddyName">Buddy Name:</label>
-    <input type="text" id="buddyName" name="name" required>
-    <label for="buddyAddress">Buddy Address:</label>
-    <input type="text" id="buddyAddress" name="address" required>
-    <label for="buddyNumber">Buddy Number:</label>
-    <input type="text" id="buddyNumber" name="address" required>
-    <label for="addressBookId">Address Book ID:</label>
-    <input type="text" id="addressBookId" name="address" required>
-    <button type="submit">Create Buddy</button>
-</form>
+    <table class = "table table-striped table-bordered">
+        <thead class = "table-dark">
+        <tr>
+            <th> Buddy Info ID </th>
+            <th> Buddy Name </th>
+            <th> Buddy Address </th>
+            <th> Buddy Number </th>
+            <th> Actions </th>
+        </tr>
+        </thead>
+        <tbody id="buddyInfoTableBody">
+    </table>
+</div>
 
+<script>
+    function populateTable() {
+        $.ajax({
+            url: '/api/v1/address-book',
+            type: 'GET',
+            dataType: 'json',
+            success: function(addressBooks) {
+                const addressBookTableBody = document.getElementById('addressBookTableBody');
+                addressBookTableBody.innerHTML = '';
+                addressBooks.forEach(function(addressBook) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${addressBook.id}</td>
+                            <td>${addressBook.name}</td>
+                            <td><button class="btn btn-primary" onclick="updateAddressBook(${addressBook.id})">Update</button>
+                            <button class="btn btn-danger" onclick="deleteAddressBook(${addressBook.id})">Delete</button></td>
+                        `;
+                    addressBookTableBody.appendChild(row);
+                });
+            }
+        });
+
+        $.ajax({
+            url: '/api/v1/buddy-info',
+            type: 'GET',
+            dataType: 'json',
+            success: function(buddyInfos) {
+                const buddyInfoTableBody = document.getElementById('buddyInfoTableBody');
+                buddyInfoTableBody.innerHTML = '';
+                buddyInfos.forEach(function(buddyInfo) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${buddyInfo.id}</td>
+                            <td>${buddyInfo.buddyName}</td>
+                            <td>${buddyInfo.address}</td>
+                            <td>${buddyInfo.number}</td>
+                            <td><button class="btn btn-primary" onclick="updateBuddyInfo(${buddyInfo.id})">Update</button>
+                            <button class="btn btn-danger" onclick="deleteBuddyInfo(${buddyInfo.id})">Delete</button></td>
+                        `;
+                    buddyInfoTableBody.appendChild(row);
+                });
+            }
+        });
+    }
+
+    function createAddressBook() {
+        openAddressBookPopup(true);
+    }
+    function createBuddyInfo() {
+        openBuddyInfoPopup(false);
+    }
+    function updateAddressBook(id) {
+        openAddressBookPopup(true,id);
+    }
+    function updateBuddyInfo(id) {
+        openBuddyInfoPopup(false, id);
+    }
+
+    function openAddressBookPopup(isAddress, editId) {
+        const fields = `
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+    `;
+        const title = editId ? 'Edit Address Book' : 'Add Address Book';
+        return openPopup(isAddress, editId, title, fields);
+    }
+    function openBuddyInfoPopup(isAddress, editId) {
+        const fields = `
+        <div class="form-group">
+            <label for="buddyName">Name:</label>
+            <input type="text" class="form-control" id="buddyName" required>
+        </div>
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="text" class="form-control" id="address" required>
+        </div>
+        <div class="form-group">
+            <label for="number">Phone Number:</label>
+            <input type="text" class="form-control" id="number" required>
+        </div>
+    `;
+        const title = editId ? 'Edit Buddy Info' : 'Add Buddy Info';
+        return openPopup(isAddress,editId, title, fields);
+    }
+    function openPopup(isAddress, id, title, fields) {
+        const modalContainer = document.createElement('div');
+        modalContainer.classList.add('modal-container');
+
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-content');
+        modalContent.innerHTML = `
+                    <h2>${title}</h2>
+                    <form id="popupForm" onsubmit="sendDataToServer(${isAddress}, ${id})">
+                        ${fields}
+                        <div class="popup-buttons">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                `;
+
+        modalContainer.appendChild(modalContent);
+        document.body.appendChild(modalContainer);
+
+        modalContainer.addEventListener('click', function(event) {
+            if (event.target === modalContainer) {
+                closePopup(modalContainer);
+            }
+        });
+    }
+    function closePopup(modalContainer) {
+        document.body.removeChild(modalContainer);
+    }
+
+
+    function sendDataToServer(isAddress, id) {
+        const formData = new FormData(document.getElementById('popupForm'));
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        closePopup(document.querySelector('.modal-container'));
+
+        const baseUrl = '/api/v1/';
+        const resource = isAddress ? 'address-book/' : 'buddy-info/';
+        const finalUrl = `${baseUrl}${resource}${id ? id : ''}`;
+        const type = id ? 'PUT' : 'POST';
+
+        $.ajax({
+            url: finalUrl,
+            type: type,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                console.log('Data updated successfully:', response);
+                populateTable();
+            },
+            error: function(error) {
+                console.error('Error updating data:', error);
+            }
+        });
+    }
+    function deleteAddressBook(id) {
+        $.ajax({
+            url: `/api/v1/address-book/${id}`,
+            type: 'DELETE',
+            success: function(response) {
+                console.log('Address Book deleted successfully:', response);
+                populateTable();
+            },
+            error: function(error) {
+                console.error('Error deleting Address Book:', error);
+            }
+        });
+    }
+    function deleteBuddyInfo(id) {
+        $.ajax({
+            url: `/api/v1/buddy-info/${id}`,
+            type: 'DELETE',
+            success: function(response) {
+                console.log('Buddy Info deleted successfully:', response);
+                populateTable();
+            },
+            error: function(error) {
+                console.error('Error deleting Buddy Info:', error);
+            }
+        });
+    }
+
+    window.onload = populateTable;
+</script>
 </body>
-
 </html>
